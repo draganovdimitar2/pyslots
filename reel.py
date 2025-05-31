@@ -5,7 +5,7 @@ from symbols import Symbol
 
 
 class Reel:
-    def __init__(self, pos: tuple):  # pass the tuple for pos from machine class (x_topleft, y_topleft)
+    def __init__(self, pos: tuple):
         self.symbol_list = pygame.sprite.Group()
         self.shuffled_keys = choices(weighted_symbols, k=5)  # both shuffle and limits the reels to 5
         self.reel_is_spinning = False
@@ -14,7 +14,7 @@ class Reel:
 
         for idx, item in enumerate(self.shuffled_keys):
             symbol_path = symbols[item]
-            self.symbol_list.add(Symbol(symbol_path, pos, idx, item))  # <-- add name
+            self.symbol_list.add(Symbol(symbol_path, pos, idx, item))
             pos = (pos[0], pos[1] + SYMBOL_HEIGHT)
 
     def animate(self, delta_time):
@@ -28,7 +28,7 @@ class Reel:
 
             if self.delay_time <= 0:  # starting the animations
 
-                # Iterate through all 5 symbols in the reel; truncate; add new symbol on top of the stack
+                # iterate through all 5 symbols in the reel; truncate; add new symbol on top of the stack
                 for symbol in self.symbol_list:
                     symbol.rect.bottom += 20  # each tick move each symbol downwards
 
@@ -45,4 +45,16 @@ class Reel:
                         self.symbol_list.add(
                             Symbol(symbol_path, (symbol.x_val, -SYMBOL_HEIGHT), symbol_idx, new_name))
 
+    def start_spin(self, delay_time):
+        self.delay_time = delay_time
+        self.spin_time = 1000 + delay_time
+        self.reel_is_spinning = True
 
+    def reel_spin_result(self):  # get and return self repr of symbols on a given reel
+        spin_symbols = []
+        for i in GAME_INDICES:
+            spin_symbols.append(self.symbol_list.sprites()[i].name)
+        return spin_symbols[::-1]
+
+    def update(self):
+        pass
