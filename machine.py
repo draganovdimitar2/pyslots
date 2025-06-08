@@ -106,3 +106,51 @@ class Machine:
                 self.spin_sound.play()
                 self.win_animation_ongoing = False
 
+    def get_result(self):
+        for reel in self.reel_list:
+            self.spin_result[reel] = self.reel_list[reel].reel_spin_result()
+        return self.spin_result
+
+    def flip_reels_horizontally(self):
+        # Extract columns in sorted key order to ensure consistent ordering
+        horizontal_values = [v for v in self.spin_result.values()]
+
+        rows, cols = len(horizontal_values), len(horizontal_values[0])
+
+        hvals2 = [
+            # outer loop: iterate over each column index in the original grid
+            # inner loop: for each column, collect values from bottom to top across rows (x)
+            [horizontal_values[x][y] for x in reversed(range(rows))]  # reverse row order to simulate rotation
+            for y in range(cols)  # # each new row corresponds to a column in the original grid
+        ]
+
+        # Reverse each row to complete the horizontal flip
+        return [row[::-1] for row in hvals2]
+
+    def check_wins(self):
+        winning_lines = []  # This will store complete paylines that win
+        horizontal = self.flip_reels_horizontally()
+
+        for line_idx in range(self.currPlayer.lines):
+            line = PAYLINES[line_idx]
+            symbol = None
+            is_winning = True
+            for (row, col) in line:
+                if symbol is None:
+                    symbol = horizontal[row][col]
+                if horizontal[row][col] != symbol:
+                    is_winning = False
+                    break
+
+            if is_winning:
+                winning_lines.append(line)  # Add the complete winning payline
+
+        if winning_lines:
+            self.won_lines_count = len(winning_lines)
+            print(winning_lines)
+            print(self.won_lines_count)
+            self.can_animate = True
+            return winning_lines
+        return None
+
+
