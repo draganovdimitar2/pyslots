@@ -46,7 +46,7 @@ class Machine:
             self.spin_result = self.get_result()
             if self.check_wins():
                 self.win_data = self.check_wins()
-                # Play the win audio
+                # play the win audio
                 self.win_sound.play()
                 self.pay_player()
                 self.win_animation_ongoing = True
@@ -56,14 +56,12 @@ class Machine:
         if self.can_toggle and self.currPlayer.balance >= self.currPlayer.bet_size:
             keys = pygame.key.get_pressed()
 
-            # Space key triggers on press (can be held)
             if keys[pygame.K_SPACE]:
                 self.toggle_spinning()
                 self.currPlayer.place_bet()
                 self.machine_balance += self.currPlayer.bet_size
                 self.currPlayer.last_payout = None
 
-            # Check for KEYUP events for arrows only
             for event in events:
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_DOWN:
@@ -79,6 +77,11 @@ class Machine:
                         if self.currPlayer.bet_size > 0:
                             self.currPlayer.bet_size -= 1
 
+    def draw_symbols_on_each_reel(self):
+        for reel in self.reel_list:
+            self.reel_list[reel].symbol_list.draw(self.display_surface)
+            self.reel_list[reel].symbol_list.update()
+
     def draw_reels(self, delta_time):
         for reel in self.reel_list:
             self.reel_list[reel].animate(delta_time)
@@ -91,7 +94,7 @@ class Machine:
             if self.reel_index > 0:
                 x_topleft, y_topleft = x_topleft + SYMBOL_WIDTH, y_topleft
 
-            self.reel_list[self.reel_index] = Reel((x_topleft, y_topleft))  # Need to create reel class
+            self.reel_list[self.reel_index] = Reel((x_topleft, y_topleft))  # need to create reel class
             self.reel_index += 1
 
     def toggle_spinning(self):
@@ -112,7 +115,7 @@ class Machine:
         return self.spin_result
 
     def flip_reels_horizontally(self):
-        # Extract columns in sorted key order to ensure consistent ordering
+        # extract columns in sorted key order to ensure consistent ordering
         horizontal_values = [v for v in self.spin_result.values()]
 
         rows, cols = len(horizontal_values), len(horizontal_values[0])
@@ -124,11 +127,11 @@ class Machine:
             for y in range(cols)  # # each new row corresponds to a column in the original grid
         ]
 
-        # Reverse each row to complete the horizontal flip
+        # reverse each row to complete the horizontal flip
         return [row[::-1] for row in hvals2]
 
     def check_wins(self):
-        winning_lines = []  # This will store complete paylines that win
+        winning_lines = []  # this will store complete paylines that win
         horizontal = self.flip_reels_horizontally()
 
         for line_idx in range(self.currPlayer.lines):
@@ -143,7 +146,7 @@ class Machine:
                     break
 
             if is_winning:
-                winning_lines.append(line)  # Add the complete winning payline
+                winning_lines.append(line)  # add the complete winning payline
 
         if winning_lines:
             self.won_lines_count = len(winning_lines)
@@ -153,4 +156,59 @@ class Machine:
             return winning_lines
         return None
 
+    def pay_player(self):
+        spin_payout = self.currPlayer.bet_size * (3 * self.won_lines_count)
+        self.currPlayer.balance += spin_payout
+        self.machine_balance -= spin_payout
+        self.currPlayer.last_payout = spin_payout
+        self.currPlayer.total_won += spin_payout
 
+    def win_animation(self):
+        if self.win_animation_ongoing and self.win_data:
+            # then apply effects to winning symbols in complete paylines
+            for payline in self.win_data:
+                for (row, col) in payline:
+                    reel = self.reel_list[col]
+                    symbols = reel.symbol_list.sprites()[::-1]  # reverse to match top-down
+                    symbol = symbols[row + 1]  # visible rows start from index 1
+                    symbol.fade_in = True
+
+                    # set non-winning symbols to fade out
+                    for other_reel in self.reel_list.values():
+                        for other_symbol in other_reel.symbol_list:
+                            if not hasattr(other_symbol, 'fade_in') or not other_symbol.fade_in:
+                                other_symbol.fade_out = True
+
+    def win_lines(self):
+        if not self.win_animation_ongoing or not self.win_data:
+            return
+
+        # for each complete winning payline
+        for payline in self.win_data:
+            points = []
+            for (row, col) in payline:
+                # get the corresponding reel and symbol sprite
+                reel = self.reel_list[col]
+                symbols_sprite = reel.symbol_list.sprites()
+                symbols_reversed = symbols_sprite[::-1]  # reverse to match top-down visual layout
+
+                # symbols visible rows start from index 1
+                symbol = symbols_reversed[row + 1]
+
+                # get the center of the symbol rect to connect the line smoothly
+                center_pos = symbol.rect.center
+                # when symbols fade they got to the right direction slightly so add 10px on the x value
+                new_pos = (center_pos[0] + 10, center_pos[1])
+                points.append(new_pos)
+
+            if len(points) > 1:
+                self.ui.draw_win_lines(points)
+
+    def update(self, delta_time, events):
+        self.cooldowns()
+        self.input(events)  # constantly check for user input
+        self.draw_reels(delta_time)
+        self.draw_symbols_on_each_reel()
+        self.ui.update()
+        self.win_animation()
+        self.win_lines()
