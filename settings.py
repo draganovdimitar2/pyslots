@@ -52,7 +52,6 @@ weighted_symbols = [  # currently using only 5 symbols
 
 ]
 
-# lines.py or inside Machine class
 PAYLINES = [
     [(0, 0), (0, 1), (0, 2)],
     [(1, 0), (1, 1), (1, 2)],
