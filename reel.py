@@ -2,22 +2,23 @@ import pygame
 from random import choice, choices
 from settings import *
 from symbols import Symbol
+from typing import Tuple, List
 
 
 class Reel:
-    def __init__(self, pos: tuple):
-        self.symbol_list = pygame.sprite.Group()
-        self.shuffled_keys = choices(weighted_symbols, k=5)  # both shuffle and limits the reels to 5
-        self.reel_is_spinning = False
-        self.delay_time = 0
-        self.spin_time = 0
+    def __init__(self, pos: Tuple[int, int]) -> None:
+        self.symbol_list: pygame.sprite.Group = pygame.sprite.Group()
+        self.shuffled_keys: List[str] = choices(weighted_symbols, k=5)  # both shuffle and limits the reels to 5
+        self.reel_is_spinning: bool = False
+        self.delay_time: float = 0.0
+        self.spin_time: float = 0.0
 
         for idx, item in enumerate(self.shuffled_keys):
-            symbol_path = symbols[item]
+            symbol_path: str = symbols[item]
             self.symbol_list.add(Symbol(symbol_path, pos, idx, item))
             pos = (pos[0], pos[1] + SYMBOL_HEIGHT)
 
-    def animate(self, delta_time):
+    def animate(self, delta_time: float) -> None:
         if self.reel_is_spinning:
             self.delay_time -= delta_time * 1000
             self.spin_time -= delta_time * 1000
@@ -45,16 +46,16 @@ class Reel:
                         self.symbol_list.add(
                             Symbol(symbol_path, (symbol.x_val, -SYMBOL_HEIGHT), symbol_idx, new_name))
 
-    def start_spin(self, delay_time):
+    def start_spin(self, delay_time: float) -> None:
         self.delay_time = delay_time
         self.spin_time = 1000 + delay_time
         self.reel_is_spinning = True
 
-    def reel_spin_result(self):  # get and return self repr of symbols on a given reel
+    def reel_spin_result(self) -> List[str]:  # get and return self repr of symbols on a given reel
         spin_symbols = []
         for i in GAME_INDICES:
             spin_symbols.append(self.symbol_list.sprites()[i].name)
         return spin_symbols[::-1]
 
-    def update(self):
+    def update(self) -> None:
         pass

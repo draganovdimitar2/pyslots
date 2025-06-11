@@ -7,19 +7,19 @@ from machine import Machine
 class GameController:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.screen: pygame.Surface = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption('Slot Machine Demo')
-        self.clock = pygame.time.Clock()
-        self.bg_unscaled = pygame.image.load(BACKGROUND).convert()
-        self.background = pygame.transform.scale(self.bg_unscaled, (WIDTH, HEIGHT))
-        self.machine = Machine()
-        self.delta_time = 0
+        self.clock: pygame.time.Clock = pygame.time.Clock()
+        self.bg_unscaled: pygame.Surface = pygame.image.load(BACKGROUND).convert()
+        self.background: pygame.Surface = pygame.transform.scale(self.bg_unscaled, (WIDTH, HEIGHT))
+        self.machine: Machine = Machine()
+        self.delta_time: float = 0.0
 
         # Sound
         # main_sound = pygame.mixer.Sound('audio/main_song.mp3')
         # main_sound.play()
 
-    def run(self):
+    def run(self) -> None:
         start_time = pygame.time.get_ticks()
         running = True
         while running:
