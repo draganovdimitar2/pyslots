@@ -5,12 +5,19 @@ from typing import List, Tuple
 
 
 class UI:
+    """
+     Handle only user interface-related elements (balance, bet, lines..)
+    """
     def __init__(self, player: "Player"):
         self.player: Player = player
         self.display_surface: pygame.Surface = pygame.display.get_surface()
         self.font, self.bet_font = pygame.font.Font(UI_FONT, UI_FONT_SIZE), pygame.font.Font(UI_FONT, UI_FONT_SIZE)
         self.win_font = pygame.font.Font(UI_FONT, WIN_FONT_SIZE)
         self.win_text_angle = random.randint(-4, 4)
+
+        self.jackpot_timer = 0.0
+        self.jackpot_duration = 5.0  # seconds to show jackpot message
+        self.jackpot_amount = 0
 
     def display_info(self) -> None:
         player_data = self.player.get_data()
@@ -27,7 +34,7 @@ class UI:
         x = WIDTH - 20
         bet_rect = bet_sur.get_rect(bottomright=(x, y))
 
-        # Draw data
+        # draw data
         pygame.draw.rect(self.display_surface, False, balance_rect)
         pygame.draw.rect(self.display_surface, False, lines_rect)
         pygame.draw.rect(self.display_surface, False, bet_rect)
@@ -35,7 +42,7 @@ class UI:
         self.display_surface.blit(lines_surf, lines_rect)
         self.display_surface.blit(bet_sur, bet_rect)
 
-        # Print last win if applicable
+        # print last win if applicable
         if self.player.last_payout:
             last_payout = player_data['last_payout']
             win_surf = self.win_font.render("WIN! $" + last_payout, True, TEXT_COLOR, None)
@@ -46,14 +53,41 @@ class UI:
             self.display_surface.blit(win_surf, win_rect)
 
     def draw_win_lines(self, points: List[Tuple[int, int]]) -> None:
-        line_color = (255, 0, 0)
+        line_color = (255, 255, 255)
         line_thickness = 3
 
         pygame.draw.lines(self.display_surface, line_color, False, points, line_thickness)
-        # Add circles at connection points for better visibility
-        for point in points:
-            pygame.draw.circle(self.display_surface, line_color, point, 4)
 
-    def update(self) -> None:
+
+    def mystery_hit(self, mystery_amount) -> None:  #  sets the jackpot amount and resets the timer
+        self.jackpot_amount = mystery_amount
+        self.jackpot_timer = self.jackpot_duration
+
+    def jackpot_font(self) -> None:
+        if self.jackpot_timer > 0:
+            font = pygame.font.SysFont(None, 150)
+
+            r = random.randint(200, 255)
+            g = random.randint(0, 220)
+            b = random.randint(0, 0)
+            # line 1: "JACKPOT!"
+            text1 = font.render("JACKPOT!", True, (r, g, b))
+            text1_rect = text1.get_rect(center=(self.display_surface.get_width() // 2, self.display_surface.get_height() // 3))
+
+            # line 2: "Won xxx.xx coins!"
+            text2 = font.render(f"Won {self.jackpot_amount:.2f} coins!", True, (r, g, b))
+            text2_rect = text2.get_rect(center=(self.display_surface.get_width() // 2, text1_rect.bottom + 150))
+
+            # blit both
+            self.display_surface.blit(text1, text1_rect)
+            self.display_surface.blit(text2, text2_rect)
+
+            # Countdown timer
+            self.jackpot_timer -= 1 / 60
+
+
+    def update(self, target_surface: pygame.Surface) -> None:
         pygame.draw.rect(self.display_surface, 'Black', pygame.Rect(0, HEIGHT - UI_HEIGHT, WIDTH, UI_HEIGHT))
         self.display_info()
+        self.jackpot_font()
+
