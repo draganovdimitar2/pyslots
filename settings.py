@@ -1,7 +1,9 @@
 import os
+from random import randint
 
 BASE_DIR = os.path.dirname(__file__)
 IMAGE_DIR = os.path.join(BASE_DIR, "image", "symbols")
+COINS_DIR = os.path.join(BASE_DIR, "image", "coins")
 
 BACKGROUND = "image/background.jpg"
 FPS = 120
@@ -34,25 +36,33 @@ symbols = {
     "diamond": os.path.join(IMAGE_DIR, "7.png"),
     "spade": os.path.join(IMAGE_DIR, "8.png"),
     "present": os.path.join(IMAGE_DIR, "9.png"),
-    "club": os.path.join(IMAGE_DIR, "10.png")
+    "club": os.path.join(IMAGE_DIR, "10.png"),
+    "seven": os.path.join(IMAGE_DIR, "11.png"),
+    "cherry": os.path.join(IMAGE_DIR, "12.png"),
+    "bar": os.path.join(IMAGE_DIR, "13.png"),
+    "grape": os.path.join(IMAGE_DIR, "14.png")
 }
 
-# if you add more symbols, winning chances will become lower
-weighted_symbols = [  # currently using only 5 symbols
-    "star", "star", "star", "star",
-    "bell", "bell", "bell", "bell",
-    "clover", "clover", "clover", "clover",
-    "diamond",
-    "lemon",
-    # "clover",
-    # "diamond",
-    # "spade",
-    # "present",
-    # "club"
-
+coins = [
+    os.path.join(COINS_DIR, "coin_1.png"),
+    os.path.join(COINS_DIR, "coin_2.png"),
+    os.path.join(COINS_DIR, "coin_3.png"),
+    os.path.join(COINS_DIR, "coin_4.png"),
+    os.path.join(COINS_DIR, "coin_5.png"),
+    os.path.join(COINS_DIR, "coin_6.png")
 ]
 
-PAYLINES = [
+# if you add more symbols, winning chances will become lower
+weighted_symbols = [  # currently using only 6 symbols, you can remove or add more to increase\decrease winning chance
+    "grape",
+    "cherry",
+    'seven',
+    "clover",
+    "diamond",
+    "bar",
+]
+
+PAYLINES = [  # You can add your custom lines here
     [(0, 0), (0, 1), (0, 2)],
     [(1, 0), (1, 1), (1, 2)],
     [(2, 0), (2, 1), (2, 2)],
@@ -91,3 +101,11 @@ PAYLINES = [
     [(1, 0), (1, 1), (2, 2), (2, 3), (2, 4)],
     [(0, 0), (1, 1), (1, 2), (1, 3), (2, 4)]
 ]
+
+MYSTERY_STARTING_AMOUNT = randint(1000, 10000)  # Jackpot will be a random num between 1000 and 10000 each game
+# you can modify the mystery ranges based on your own preferences
+MYSTERY_START_RANGE = 50
+MYSTERY_END_RANGE = 100
+
+MYSTERY_PERCENT_PER_BET = 0.2  # 20 % will go for the jackpot each bet
+MYSTERY_CHANCE_INCREASE_PER_BET = 1
