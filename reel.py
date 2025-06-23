@@ -51,7 +51,7 @@ class Reel:
         self.spin_time = 1000 + delay_time
         self.reel_is_spinning = True
 
-    def reel_spin_result(self) -> List[str]:  # get and return self repr of symbols on a given reel
+    def reel_spin_result(self) -> List[str]:
         spin_symbols = []
         for i in GAME_INDICES:
             spin_symbols.append(self.symbol_list.sprites()[i].name)
