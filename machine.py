@@ -6,7 +6,7 @@ from mystery import Mystery
 from jackpot_coins import CoinAnimation
 from ui import UI
 from random import randint
-from typing import Dict, Optional, List, Tuple, Set, Sequence
+from typing import Dict, Optional, List, Tuple, Set, Sequence, Any
 import random
 
 
@@ -66,7 +66,7 @@ class Machine:
                 self.mystery_sound.play()
                 self.pay_mystery()
                 self.ui.mystery_hit(self.mystery.mystery_amount)
-                self.mystery.mystery_amount = randint(1000, 10000) # reset mystery amount
+                self.mystery.mystery_amount = randint(1000, 10000)  # reset mystery amount
             elif self.check_wins():
                 self.win_data = self.check_wins()
                 # play the win audio
@@ -124,6 +124,7 @@ class Machine:
 
     def toggle_spinning(self) -> None:
         if self.can_toggle:
+            self.reset_each_reel_symbol_state()
             self.spinning = not self.spinning
             self.can_toggle = False
             self.won_lines_count = 0
@@ -181,12 +182,41 @@ class Machine:
             return winning_lines
         return None
 
+    def get_win_lines_and_payouts(self) -> Tuple[List[Tuple[List[Tuple[int, int]], str, int]], int]:
+        """
+        Returns a list of tuples: (payline, symbol_name, line_payout) for each winning line.
+        ([([(2, 0), (1, 1), (0, 2)], 'cherry', 12), ([(2, 0), (2, 1), (1, 2), (0, 3), (1, 4)], 'cherry', 12)], 24)
+        """
+        win_lines_and_symbols: List[Tuple[List[Tuple[int, int]], str, int]] = []
+        total_payout: int = 0
+
+        if not self.win_data:
+            return win_lines_and_symbols, 0
+
+        for payline in self.win_data:
+            positions: List[Tuple[int, int]] = list(payline)
+            row, col = positions[0]
+            reel = self.reel_list[col]
+            symbols = reel.symbol_list.sprites()[::-1]
+            symbol = symbols[row + 1]
+            symbol_name: str = symbol.name
+            payout_multiplier: float = SYMBOL_PAYTABLE.get(symbol_name, 0)
+            line_payout: int = int(self.currPlayer.bet_size * payout_multiplier)
+            win_lines_and_symbols.append((positions, symbol_name, line_payout))
+            total_payout += line_payout
+
+        return win_lines_and_symbols, total_payout
+
     def pay_player(self) -> None:
-        spin_payout = self.currPlayer.bet_size * (3 * self.won_lines_count)
-        self.currPlayer.balance += spin_payout
-        self.machine_balance -= spin_payout
-        self.currPlayer.last_payout = spin_payout
-        self.currPlayer.total_won += spin_payout
+        win_lines_and_symbols, total_payout = self.get_win_lines_and_payouts()
+        self.currPlayer.balance += total_payout
+        self.machine_balance -= total_payout
+        self.currPlayer.last_payout = total_payout
+        self.currPlayer.total_won += total_payout
+
+        # if you want to debug for more clarity print:
+        # print(f'winning lines and symbols: {win_lines_and_symbols}')
+        # print(f'Total payout: {total_payout}')
 
     def pay_mystery(self) -> None:
         # Start flashing effect for total_flash_duration seconds
@@ -208,12 +238,17 @@ class Machine:
                     symbols = reel.symbol_list.sprites()[::-1]  # reverse to match top-down
                     symbol = symbols[row + 1]  # visible rows start from index 1
                     symbol.fade_in = True
+                    symbol.is_winning = True  # used later for paying player logic
 
                     # set non-winning symbols to fade out
                     for other_reel in self.reel_list.values():
                         for other_symbol in other_reel.symbol_list:
                             if not hasattr(other_symbol, 'fade_in') or not other_symbol.fade_in:
                                 other_symbol.fade_out = True
+
+    def reset_each_reel_symbol_state(self) -> None:
+        for reel in self.reel_list.values():
+            reel.reset_current_reel_symbols_state()
 
     def win_lines(self) -> None:
         if not self.win_animation_ongoing or not self.win_data:

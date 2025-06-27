@@ -57,5 +57,9 @@ class Reel:
             spin_symbols.append(self.symbol_list.sprites()[i].name)
         return spin_symbols[::-1]
 
+    def reset_current_reel_symbols_state(self) -> None:
+        for symbol in self.symbol_list:
+            symbol.reset_state()
+
     def update(self) -> None:
         pass

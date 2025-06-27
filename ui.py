@@ -75,7 +75,7 @@ class UI:
             text1_rect = text1.get_rect(center=(self.display_surface.get_width() // 2, self.display_surface.get_height() // 3))
 
             # line 2: "Won xxx.xx coins!"
-            text2 = font.render(f"Won {self.jackpot_amount:.2f} coins!", True, (r, g, b))
+            text2 = font.render(f"Won {int(self.jackpot_amount)}$!", True, (r, g, b))
             text2_rect = text2.get_rect(center=(self.display_surface.get_width() // 2, text1_rect.bottom + 150))
 
             # blit both

@@ -19,6 +19,16 @@ class Symbol(pygame.sprite.Sprite):
         self.fade_in: bool = False
         self.fade_out: bool = False
 
+    def reset_state(self) -> None:
+         self.fade_in = False
+         self.fade_out = False
+         self.alpha = 255
+         self.size_x = SYMBOL_WIDTH
+         self.size_y = SYMBOL_HEIGHT
+         # Re-scale the image and set alpha immediately
+         self.image = pygame.transform.scale(self.raw_image, (self.size_x, self.size_y))
+         self.image.set_alpha(self.alpha)
+
     def update(self) -> None:
         # slightly increases size of winning symbols
         if self.fade_in:

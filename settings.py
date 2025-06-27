@@ -54,13 +54,20 @@ coins = [
 
 # if you add more symbols, winning chances will become lower
 weighted_symbols = [  # currently using only 6 symbols, you can remove or add more to increase\decrease winning chance
-    "grape",
-    "cherry",
-    'seven',
-    "clover",
-    "diamond",
-    "bar",
+    "cherry", "cherry", "cherry", "cherry", "cherry", "cherry",
+    'seven','seven','seven',  "seven", "seven", "seven", "seven", "seven", "seven",
+    "cherry", "seven", "bar", "diamond", "clover"
 ]
+
+# percent as decimal (e.g., 1.2 means 120% of bet)
+# If you add more symbols be sure to add them on paytable also
+SYMBOL_PAYTABLE = {
+    "cherry": 1.2,    # 120% of bet per winning line
+    "seven": 10,     # 1000% of bet
+    "bar": 5.0,       # 500% of bet
+    "diamond": 2.5,  # 250% of bet
+    "clover": 1.8     # 180% of bet
+}
 
 PAYLINES = [  # You can add your custom lines here
     [(0, 0), (0, 1), (0, 2)],
