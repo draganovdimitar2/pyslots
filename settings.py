@@ -53,10 +53,12 @@ coins = [
 ]
 
 # if you add more symbols, winning chances will become lower
-weighted_symbols = [  # currently using only 6 symbols, you can remove or add more to increase\decrease winning chance
-    "cherry", "cherry", "cherry", "cherry", "cherry", "cherry",
-    'seven','seven','seven',  "seven", "seven", "seven", "seven", "seven", "seven",
-    "cherry", "seven", "bar", "diamond", "clover"
+weighted_symbols = [  # currently using only 5 symbols, you can remove or add more to increase\decrease winning chance
+    'seven', 'seven', 'seven', 'seven', 'seven', 'seven',
+    "cherry", "cherry", "cherry", "cherry",
+    "bar", "bar", "bar",
+    "diamond", "diamond",
+    "clover"
 ]
 
 # percent as decimal (e.g., 1.2 means 120% of bet)
