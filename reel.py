@@ -12,7 +12,9 @@ class Reel:
         self.reel_is_spinning: bool = False
         self.delay_time: float = 0.0
         self.spin_time: float = 0.0
+        self.add_symbols_to_reel(pos)
 
+    def add_symbols_to_reel(self, pos):
         for idx, item in enumerate(self.shuffled_keys):
             symbol_path: str = symbols[item]
             self.symbol_list.add(Symbol(symbol_path, pos, idx, item))
