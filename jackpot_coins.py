@@ -1,19 +1,20 @@
 import pygame
 import random
 from settings import WIDTH, HEIGHT
+from typing import List, Sequence
 
 class Coin(pygame.sprite.Sprite):
-    def __init__(self, images):
+    def __init__(self, images: pygame.Surface) -> None:
         super().__init__()
-        self.images = images
-        self.image_index = 0
-        self.image = self.images[self.image_index]
-        self.rect = self.image.get_rect(center=(random.randint(0, WIDTH), random.randint(0, HEIGHT)))
-        self.timer = 0
-        self.animation_speed = 0.1
-        self.velocity = [random.uniform(-1, 1), random.uniform(-2, -1)]
+        self.images: pygame.Surface = images
+        self.image_index: int = 0
+        self.image: pygame.Surface = self.images[self.image_index]
+        self.rect: pygame.Rect = self.image.get_rect(center=(random.randint(0, WIDTH), random.randint(0, HEIGHT)))
+        self.timer: float = 0
+        self.animation_speed: float = 0.1
+        self.velocity: List[float] = [random.uniform(-1, 1), random.uniform(-2, -1)]
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
         self.timer += dt
         if self.timer >= self.animation_speed:
             self.image_index = (self.image_index + 1) % len(self.images)
@@ -31,21 +32,21 @@ class Coin(pygame.sprite.Sprite):
 
 
 class CoinAnimation:
-    def __init__(self, coin_image_paths):
-        self.coin_images = [pygame.transform.scale(pygame.image.load(path).convert_alpha(), (80, 80)) for path in coin_image_paths]
-        self.coins = pygame.sprite.Group()
-        self.active = False
-        self.duration = 5 # seconds
-        self.timer = 0
+    def __init__(self, coin_image_paths: List[str]) -> None:
+        self.coin_images: List[pygame.Surface] = [pygame.transform.scale(pygame.image.load(path).convert_alpha(), (80, 80)) for path in coin_image_paths]
+        self.coins: pygame.sprite.Group = pygame.sprite.Group()
+        self.active: bool = False
+        self.duration: int = 5 # seconds
+        self.timer: int = 0
 
-    def trigger(self):
+    def trigger(self) -> None:
         self.active = True
         self.timer = self.duration
         self.coins.empty()
         for _ in range(30):  # spawn 30 animated coins
             self.coins.add(Coin(self.coin_images))
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
         if self.active:
             self.timer -= dt
             if self.timer <= 0:
@@ -54,6 +55,6 @@ class CoinAnimation:
             else:
                 self.coins.update(dt)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         if self.active:
             self.coins.draw(surface)

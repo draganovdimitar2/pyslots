@@ -62,6 +62,3 @@ class Reel:
     def reset_current_reel_symbols_state(self) -> None:
         for symbol in self.symbol_list:
             symbol.reset_state()
-
-    def update(self) -> None:
-        pass

@@ -5,7 +5,7 @@ from machine import Machine
 
 
 class GameController:
-    def __init__(self):
+    def __init__(self) -> None:
         pygame.init()
         self.screen: pygame.Surface = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption('Slot Machine Demo')

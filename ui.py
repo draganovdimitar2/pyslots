@@ -8,16 +8,17 @@ class UI:
     """
      Handle only user interface-related elements (balance, bet, lines..)
     """
-    def __init__(self, player: "Player"):
+    def __init__(self, player: "Player") -> None:
         self.player: Player = player
         self.display_surface: pygame.Surface = pygame.display.get_surface()
-        self.font, self.bet_font = pygame.font.Font(UI_FONT, UI_FONT_SIZE), pygame.font.Font(UI_FONT, UI_FONT_SIZE)
-        self.win_font = pygame.font.Font(UI_FONT, WIN_FONT_SIZE)
-        self.win_text_angle = random.randint(-4, 4)
+        self.font: pygame.font.Font = pygame.font.Font(UI_FONT, UI_FONT_SIZE)
+        self.bet_font: pygame.font.Font = pygame.font.Font(UI_FONT, UI_FONT_SIZE)
+        self.win_font: pygame.font.Font = pygame.font.Font(UI_FONT, WIN_FONT_SIZE)
+        self.win_text_angle: int = random.randint(-4, 4)
 
-        self.jackpot_timer = 0.0
-        self.jackpot_duration = 5.0  # seconds to show jackpot message
-        self.jackpot_amount = 0
+        self.jackpot_timer: float = 0.0
+        self.jackpot_duration: float = 5.0  # seconds to show jackpot message
+        self.jackpot_amount: int = 0
 
     def display_info(self) -> None:
         player_data = self.player.get_data()
@@ -59,7 +60,7 @@ class UI:
         pygame.draw.lines(self.display_surface, line_color, False, points, line_thickness)
 
 
-    def mystery_hit(self, mystery_amount) -> None:  #  sets the jackpot amount and resets the timer
+    def mystery_hit(self, mystery_amount: int) -> None:  #  sets the jackpot amount and resets the timer
         self.jackpot_amount = mystery_amount
         self.jackpot_timer = self.jackpot_duration
 
